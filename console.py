@@ -125,7 +125,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
 
-        args = args[1:]
+        args = arg[1:]
 
         params = {}
         for param in args:
