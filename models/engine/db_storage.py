@@ -32,11 +32,13 @@ class DBStorage:
                                         ))
         if env == 'test':
             Base.metadata.drop_all(self.__engine)
-    
+
     def all(self, cls=None):
         """get all of them."""
         dic = {}
         if cls:
+            if type(cls) == str:
+                cls = eval(cls)
             q = self.__session.query(cls)
             for el in q:
                 key = "{}.{}".format(el.__class__.__name__, el.id)
@@ -57,7 +59,7 @@ class DBStorage:
     def save(self):
         """save them ( I mean the model instances)."""
         self.__session.commit()
-    
+
     def delete(self, obj=None):
         """delete them!!!."""
         if obj:
