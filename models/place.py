@@ -47,14 +47,14 @@ class Place(BaseModel, Base):
                     review_list.append(obj)
             return review_list
 
+        @property
+        def amenities(self):
+            """getter function for amenities."""
+            return self.amenity_ids
+
         @amenities.setter
         def amenities(self, obj):
             """setter function for amenities method."""
             if obj.__class__.__name__ == 'Amenity':
                 if obj.id not in self.amenity_ids:
                     self.amenity_ids.append(obj.id)
-
-        @property
-        def amenities(self):
-            """getter function for amenities."""
-            return self.amenity_ids
