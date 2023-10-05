@@ -6,66 +6,33 @@ from fabric.api import *
 env.hosts = ['54.160.106.104', '54.146.74.156']
 
 
-def do_pack():
-    """
-    Targging project directory into a packages as .tgz
-    """
-    now = datetime.now().strftime("%Y%m%d%H%M%S")
-    local('sudo mkdir -p ./versions')
-    path = './versions/web_static_{}'.format(now)
-    local('sudo tar -czvf {}.tgz web_static'.format(path))
-    name = '{}.tgz'.format(path)
-    if name:
-        return name
-    else:
-        return None
-
-
-def do_deploy(archive_path):
-    """Deploy the boxing package tgz file
-    """
-    try:
-        archive = archive_path.split('/')[-1]
-        path = '/data/web_static/releases/' + archive.strip('.tgz')
-        current = '/data/web_static/current'
-        put(archive_path, '/tmp')
-        run('mkdir -p {}'.format(path))
-        run('tar -xzf /tmp/{} -C {}'.format(archive, path))
-        run('rm /tmp/{}'.format(archive))
-        run('mv {}/web_static/* {}'.format(path, path))
-        run('rm -rf {}/web_static'.format(path))
-        run('rm -rf {}'.format(current))
-        run('ln -s {} {}'.format(path, current))
-        print('New version deployed!')
-        return True
-    except Exception:
-        return False
-
-
-def deploy():
-    """
-    A function to call do_pack and do_deploy
-    """
-    archive_path = do_pack()
-    answer = do_deploy(archive_path)
-    return answer
-
 
 def do_clean(number=0):
     """
     Keep it cleanning the repositories
     """
+    try:
+        number = int(number)
+    except Exception:
+        return False
+    nb_of_arch = local('ls -ltr versions | wc -l', capture=True).stdout
+    nb_of_arch = int(nb_of_arch) - 1
+    if nb_of_arch <= 0 or nb_of_arch == 1:
+        return True
     if number == 0 or number == 1:
-        with lcd('./versions/'):
-            local("ls -lv | rev | cut -f 1 | rev | \
-            head -n +1 | xargs -d '\n' rm -rf")
-        with cd('/data/web_static/releases/'):
-            run("sudo ls -lv | rev | cut -f 1 | \
-            rev | head -n +1 | xargs -d '\n' rm -rf")
+        arch_to_rm = nb_of_arch - 1
     else:
-        with lcd('./versions/'):
-            local("ls -lv | rev | cut -f 1 | rev | \
-            head -n +{} | xargs -d '\n' rm -rf".format(number))
-        with cd('/data/web_static/releases/'):
-            run("sudo ls -lv | rev | cut -f 1 | \
-            rev | head -n +{} | xargs -d '\n' rm -rf".format(number))
+        arch_to_rm = arch_to_rm - number
+        if arch_to_rm <= 0:
+            return True
+    archives = local("ls -ltr versions | tail -n " + str(nb_of_arch) + "\
+            | head -n \
+            " + str(arch_to_rm) + "\
+            | awk '{print $9}'", capture=True)
+    archives_list = archives.rsplit('\n')
+    if len(archives_list) >= 1:
+        for arch in archives_list:
+            if (arch != ''):
+                local("rm versions/" + arch)
+                run('rm -rf /data/web_static/releases/\
+                    ' + arch.split('.')[0]) 

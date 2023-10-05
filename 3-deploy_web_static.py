@@ -59,4 +59,6 @@ def deploy():
     if archive_path is None:
         return False
     deply = do_deploy(archive_path)
+    if (deply is False):
+        return False
     return deply
