@@ -21,6 +21,7 @@ def do_pack():
     else:
         return None
 
+
 def do_deploy(archive_path):
     """
     copies the archive files from my local machine to the servers
@@ -47,10 +48,11 @@ def do_deploy(archive_path):
     except Exception:
         return False
 
+
 def deploy():
     """creates and distributes an archive to the web servers
     """
     archive_path = do_pack()
     if archive_path is None:
-	return False
+        return False
     return do_deploy(archive_path)
