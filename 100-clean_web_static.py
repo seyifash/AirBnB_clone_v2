@@ -7,24 +7,20 @@ env.hosts = ['54.160.106.104', '54.146.74.156']
 
 
 def do_clean(number=0):
-    """Delete out-of-date archives.
-
-    Args:
-        number (int): The number of archives to keep.
-
-    If number is 0 or 1, keeps only the most recent archive. If
-    number is 2, keeps the most and second-most recent archives,
-    etc.
     """
-    number = 1 if int(number) == 0 else int(number)
-
-    archives = sorted(os.listdir("versions"))
-    [archives.pop() for i in range(number)]
-    with lcd("versions"):
-        [local("rm ./{}".format(a)) for a in archives]
-
-    with cd("/data/web_static/releases"):
-        archives = run("ls -tr").split()
-        archives = [a for a in archives if "web_static_" in a]
-        [archives.pop() for i in range(number)]
-        [run("rm -rf ./{}".format(a)) for a in archives]
+    Keep it cleanning the repositories
+    """
+    if number == 0 or number == 1:
+        with lcd('./versions/'):
+            local("ls -lv | rev | cut -f 1 | rev | \
+            head -n +1 | xargs -d '\n' rm -rf")
+        with cd('/data/web_static/releases/'):
+            run("sudo ls -lv | rev | cut -f 1 | \
+            rev | head -n +1 | xargs -d '\n' rm -rf")
+    else:
+        with lcd('./versions/'):
+            local("ls -lv | rev | cut -f 1 | rev | \
+            head -n +{} | xargs -d '\n' rm -rf".format(number))
+        with cd('/data/web_static/releases/'):
+            run("sudo ls -lv | rev | cut -f 1 | \
+            rev | head -n +{} | xargs -d '\n' rm -rf".format(number))
