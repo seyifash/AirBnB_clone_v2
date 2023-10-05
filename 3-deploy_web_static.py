@@ -5,6 +5,8 @@
 from fabric.api import put, run, env
 from os.path import exists
 from datetime import datetime
+from fabric.api import local
+from os.path import isdir
 env.hosts = ['54.160.106.104', '54.146.74.156']
 
 
@@ -55,4 +57,5 @@ def deploy():
     archive_path = do_pack()
     if archive_path is None:
         return False
-    return do_deploy(archive_path)
+    deply = do_deploy(archive_path)
+    return deply
