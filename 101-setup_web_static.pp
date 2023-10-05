@@ -1,6 +1,6 @@
 # Nginx configuration file
 
-thecontent="location /hbnb_static {
+$thecontent="location /hbnb_static {
         alias /data/web_static/current;
         index index.html index.htm;
     }"
@@ -11,7 +11,7 @@ exec { 'update system':
 
 package { 'nginx':
   ensure   => 'installed',
-  provider => Exec['update system']
+  require  => Exec['update system']
 }
 
 file { '/data':
@@ -44,15 +44,15 @@ file { '/data/web_static/current':
   target => '/data/web_static/releases/test'
 }
 
-exec { 'chown -R ubuntu:ubuntu /data/':
-  path => '/usr/bin/:/usr/local/bin/:/bin/'
+exec { 'change_owner':
+  command => '/usr/bin/env chown -R ubuntu:ubuntu /data/',
 }
 
-file { 'configs':
+file_line { 'configs':
   ensure  => 'present',
-  path    => '/etc/nginx/sites-available/default',
+  path    => '/etc/nginx/sites-enabled/default',
   after   => 'add_header X-Served-By \$hostname;',
-  content => $thecontent,
+  line    => $thecontent,
 }
 
 service { 'nginx':
