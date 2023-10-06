@@ -10,19 +10,15 @@ def do_clean(number=0):
     """
     Keep it cleanning the repositories
     """
-    files = local("ls versions", capture=True)
-    file_names = files.split(" ")
-    n = int(number)
-    if n in (0, 1):
-        n = 1
-    else:
-        n = len(file_names) - n
-    for i in file_names[n:]:
-        local("rm versions/{}".format(i))
-    dir_server = run("ls /data/web_static/releases")
-    dir_server_names = dir_server.split(" ")
-    for i in dir_server_names[n:]:
-        if i is 'test':
-            continue
-        run("rm -rf /data/web_static/releases/{}"
-            .format(i))
+    number = 1 if int(number) == 0 else int(number)
+
+    archives = sorted(os.listdir("versions"))
+    [archives.pop() for i in range(number)]
+    with lcd("versions"):
+        [local("rm ./{}".format(a)) for a in archives]
+
+    with cd("/data/web_static/releases"):
+        archives = run("ls -tr").split()
+        archives = [a for a in archives if "web_static_" in a]
+        [archives.pop() for i in range(number)]
+        [run("rm -rf ./{}".format(a)) for a in archives]
