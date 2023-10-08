@@ -5,6 +5,8 @@
 from fabric.api import put, run, env
 from os.path import exists
 from datetime import datetime
+from fabric.api import local
+from os.path import isdir
 env.hosts = ['54.160.106.104', '54.146.74.156']
 
 
@@ -44,6 +46,7 @@ def do_deploy(archive_path):
         run("rm -rf /data/web_static/current")
         run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
             .format(file_name))
+        print("New version deployed!")
         return True
     except Exception:
         return False
@@ -55,4 +58,7 @@ def deploy():
     archive_path = do_pack()
     if archive_path is None:
         return False
-    return do_deploy(archive_path)
+    deply = do_deploy(archive_path)
+    if (deply is False):
+        return False
+    return deply
