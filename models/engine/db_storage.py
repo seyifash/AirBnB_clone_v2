@@ -69,8 +69,7 @@ class DBStorage:
         """get them back on track, like reload them, BRO!!!"""
         Base.metadata.create_all(self.__engine)
         session = sessionmaker(self.__engine, expire_on_commit=False)
-        Session = scoped_session(session)
-        self.__session = Session()
+        self.__session = scoped_session(session)
 
     def close(self):
         """call remove() method on the private session attribute"""
