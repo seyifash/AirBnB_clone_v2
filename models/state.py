@@ -3,23 +3,24 @@
 import models
 from models.city import City
 from models.base_model import BaseModel, Base
+from os import getenv
+import sqlalchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy import String, Column
 
 
 class State(BaseModel, Base):
     """ State class """
-    if models.storage_t == "db":
-        __tablename__ = 'states'
-        name = Column(String(128), nullable=False)
-        cities = relationship('City', backref="state")
+    __tablename__ = 'states'
+    name = Column(String(128), nullable=False)
+    cities = relationship('City', backref="state")
 
-    if models.storage_t != "db":
-        @property
-        def cities(self):
-            obj_list = []
-            objs = models.storage.all(City)
-            for obj in objs.values():
-                if obj.state_id == self.id:
-                    obj_list.append(obj)
-            return obj_list
+    @property
+    def cities(self):
+        obj_list = []
+        objs = models.storage.all(City)
+        for obj in objs.values():
+            if obj.state_id == self.id:
+               obj_list.append(obj)
+        return obj_list
+
